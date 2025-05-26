@@ -409,7 +409,7 @@ def escalar_matriz(matriz, escala):
 #   Nova Função: Resumo em Arquivo
 # ========================
 
-def escrever_resumo_entregas_modificado(
+def escrever_resumo_entregas(
     rotas: Dict[int, List[Tuple[str, str, float]]],
     buscar: Callable[[str, str], float],
     filename: str = "resumo_entregas.txt"
@@ -517,7 +517,10 @@ def main():
         output_dir = os.path.join(temp, "Resultado")
         os.makedirs(output_dir, exist_ok=True)
 
+    # Cenarios baseados no número de entregas e caminhões
     cenarios = [(100, 10), (1000, 100), (10000, 1000)]
+    
+    # Fatores da escala para ser utilizadas no benchmark
     escalas = [0.5, 0.75, 1.0, 1.25, 1.5]
 
     # Abre o arquivo de resultados de benchmark dentro da pasta
@@ -538,7 +541,7 @@ def main():
             
             # escreve o resumo também dentro da pasta
             resumo_path = os.path.join(output_dir, f"resumo_{n_ent}x{n_cam}.txt")
-            escrever_resumo_entregas_modificado(rotas, buscar, filename=resumo_path)
+            escrever_resumo_entregas(rotas, buscar, filename=resumo_path)
 
             # Grava as entregas não alocadas em um outro arquivo
             if nao_alocadas:
