@@ -15,7 +15,7 @@ O objetivo deste projeto é simular um sistema de alocação de entregas em uma 
 
 ## Pré-requisitos
 
-- Python 3.8 ou superior  
+- Python 3.12.2 ou superior  
 
 ## Estrutura do Repositório
 
