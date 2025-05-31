@@ -3,6 +3,7 @@ Projeto A3 – Otimização Logística
 Autor: Pedro Pimentel, Guilherme Sampaio, Eduardo Oliveira, Daniel Koshino, Arthur Santos Lima, Allan da Silva Gomes
 Data de entrega: 13/06/2025
 """
+
 from collections import defaultdict
 from functools import partial
 from typing import Dict, List, Tuple, Callable
@@ -13,7 +14,7 @@ import heapq
 import random
 import time
 import tracemalloc
-import concurrent.futures
+from multiprocessing import Pool, cpu_count
 
 # ========================
 #   SIMULAÇÃO DE ENTREGAS
@@ -461,7 +462,7 @@ def benchmark_distancias(escala, entregas, caminhoes, grafo0, mat0, idx, nodes):
 
 def rodar_uma_escala(args):
     """
-    Função helper para ProcessPoolExecutor: 
+    Função helper para multiprocessing: 
     args = (escala, entregas, caminhoes, grafo0, mat0, idx, nodes)
     Retorna (escala, resultados_do_benchmark).
     """
@@ -474,16 +475,19 @@ def rodar_uma_escala(args):
 # ========================
 def main():
 
-    # Tentativa de  criar a pasta 'Resultado' no caminho atual
-    home = os.path.expanduser("~")
-    output_dir = os.path.join(home, "Resultado")
+    # Busca do caminho do arquivo .py
+    caminho_completo_do_script = os.path.abspath(__file__)
+    script_dir = os.path.dirname(caminho_completo_do_script)
+    caminho_saida = os.path.join(script_dir, "Resultado")
+
+    # Tentativa de criar a pasta 'Resultado' no caminho definido na variavel caminho_saida
     try:
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(caminho_saida, exist_ok=True)
     except PermissionError:
         # Caso não tenha permissão para escrita, utilizaremos a pasta temporária do sistema
         temp = tempfile.gettempdir()
-        output_dir = os.path.join(temp, "Resultado")
-        os.makedirs(output_dir, exist_ok=True)
+        caminho_saida = os.path.join(temp, "Resultado")
+        os.makedirs(caminho_saida, exist_ok=True)
 
     # Cenarios baseados no número de entregas e caminhões
     cenarios = [(100, 20), (1000, 200), (10000, 2000)]
@@ -494,7 +498,7 @@ def main():
     print("Iniciando benchmark... Tempo estimado: 1 min 30 s")
     
     # Abre o arquivo de resultados de benchmark dentro da pasta
-    resultados_path = os.path.join(output_dir, "resultados.txt")
+    resultados_path = os.path.join(caminho_saida, "resultados.txt")
     with open(resultados_path , "w", encoding="utf-8") as arquivo:
         arquivo.write("cenario\tescala\testrutura\ttempo_s\tmem_KB\n")
 
@@ -508,14 +512,13 @@ def main():
             buscar = partial(dijkstra_lista_heap, grafo)
             rotas, nao_alocadas = planejar_rotas(entregas, caminhoes, centros_distribuicao, buscar)
 
-            
             # escreve o resumo também dentro da pasta
-            resumo_path = os.path.join(output_dir, f"resumo_{n_ent}x{n_cam}.txt")
+            resumo_path = os.path.join(caminho_saida, f"resumo_{n_ent}x{n_cam}.txt")
             escrever_resumo_entregas(rotas, buscar, filename=resumo_path)
 
             # Grava as entregas não alocadas em um outro arquivo
             if nao_alocadas:
-                nao_path = os.path.join(output_dir, f"nao_alocadas_{n_ent}x{n_cam}.txt")
+                nao_path = os.path.join(caminho_saida, f"nao_alocadas_{n_ent}x{n_cam}.txt")
                 with open(nao_path, "w", encoding="utf-8") as f:
                     for e in nao_alocadas:
                         f.write(f"{e.destino}, peso={e.peso}, prazo={e.prazo}\n")
@@ -530,19 +533,24 @@ def main():
                 for esc in escalas
             ]
 
-            # Paraleliza a execução utilizando ProcessPoolExecutor
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                # Map retorna na ordem de submissão
-                for escala, resultados in executor.map(rodar_uma_escala, tarefas):
-                    print(f"[Cenário {n_ent}x{n_cam}] Escala {escala:.2f} concluída")
-                    for estrutura, dados in resultados.items():
-                        arquivo.write(
-                            f"{n_ent}x{n_cam}\t"
-                            f"{escala:.2f}\t"
-                            f"{estrutura}\t"
-                            f"{dados['tempo_s']:.6f}\t"
-                            f"{dados['mem_KB']:.2f}\n"
-                        )
+            # Utilizacao do multiprocessing.Pool para executar rodar_uma_escala em paralelo nas tarefas (escalas e métricas)
+            pool = Pool(processes=cpu_count())
+            resultados_list = pool.map(rodar_uma_escala, tarefas)
+
+            pool.close()
+            pool.join()
+
+            # Itera sobre cada resultado de escala e grava no arquivo de saída
+            for escala, resultados in resultados_list:
+                print(f"[Cenário {n_ent}x{n_cam}] Escala {escala:.2f} concluída")
+                for estrutura, dados in resultados.items():
+                    arquivo.write(
+                        f"{n_ent}x{n_cam}\t"
+                        f"{escala:.2f}\t"
+                        f"{estrutura}\t"
+                        f"{dados['tempo_s']:.6f}\t"
+                        f"{dados['mem_KB']:.2f}\n"
+                    )
 
     print(f"Benchmark finalizado. Confira '{resultados_path}'.")
 
