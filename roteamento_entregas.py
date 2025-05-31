@@ -337,38 +337,6 @@ def planejar_rotas(entregas, caminhoes, centros, buscar):
 
     return rotas, nao_alocadas
 
-
-def exibir_rotas(rotas):
-    """
-    Exibe um resumo das rotas alocadas por caminhão.
-
-    Parâmetros:
-        rotas (dict): mapa id do caminhão -> lista de rotas.
-    """
-    total_entregas = sum(len(lst) for lst in rotas.values())
-    if total_entregas == 0:
-        print("*** Nenhuma rota gerada. ***")
-        return
-
-    print("--- Resumo das Rotas ---")
-    for cid, lst in rotas.items():
-        if lst:
-            distancia_total = sum(d for _, _, d in lst)
-            print(f"Caminhão {cid}: {len(lst)} entregas, distância {distancia_total:.0f} km")
-
-
-def exibir_detalhes_entregas(rotas):
-    """
-    Exibe detalhes de cada entrega atribuída.
-
-    Parâmetros:
-        rotas (dict): mapa id do caminhão -> lista de rotas.
-    """
-    print("--- Detalhes das Entregas ---")
-    for cid, lst in rotas.items():
-        for centro, destino, dist in lst:
-            print(f"Caminhão {cid} via {centro} até {destino}: {dist:.0f} km")
-
 # ========================
 #   Funções de Escalabilidade
 # ========================
@@ -518,11 +486,13 @@ def main():
         os.makedirs(output_dir, exist_ok=True)
 
     # Cenarios baseados no número de entregas e caminhões
-    cenarios = [(100, 10), (1000, 100), (10000, 1000)]
+    cenarios = [(100, 20), (1000, 200), (10000, 2000)]
     
     # Fatores da escala para ser utilizadas no benchmark
     escalas = [0.5, 0.75, 1.0, 1.25, 1.5]
 
+    print("Iniciando benchmark... Tempo estimado: 1 min 30 s")
+    
     # Abre o arquivo de resultados de benchmark dentro da pasta
     resultados_path = os.path.join(output_dir, "resultados.txt")
     with open(resultados_path , "w", encoding="utf-8") as arquivo:
