@@ -1,17 +1,17 @@
-# Projeto A3 – Otimização Logística
+# Projeto A3 – Otimização Logística usando Estrutura de Dados
 
 Este repositório contém o código-fonte e instruções para o **Projeto A3 – Otimização Logística**, desenvolvido por:
 
-- Pedro Pimentel  
-- Guilherme Sampaio  
+- Allan da Silva Gomes  
+- Arthur Santos Lima
 - Eduardo Oliveira  
 - Daniel Koshino  
-- Arthur Santos Lima  
-- Allan da Silva Gomes  
+- Guilherme Sampaio 
+- Pedro Pimentel  
 
 ## Visão Geral
 
-O objetivo deste projeto é simular um sistema de alocação de entregas em uma frota de caminhões, comparando diferentes implementações de cálculo de rotas (lista vs. heap e lista vs. matriz) e avaliando desempenho em termos de tempo e uso de memória.
+O objetivo deste projeto é simular um sistema de alocação de entregas em uma frota de caminhões, comparando diferentes implementações de cálculo de rotas (lista de adjacência vs. heap e lista de adjacência vs. matriz de adjacência) e avaliando desempenho em termos de tempo e uso de memória.
 
 ## Pré-requisitos
 
@@ -20,7 +20,7 @@ O objetivo deste projeto é simular um sistema de alocação de entregas em uma 
 ## Estrutura do Repositório
 
 ```
-├── main.py           # Contém TUDO: classes, geração, Dijkstra, roteamento, resumo e benchmark
+├── roteamento_entregas.py           # Contém TUDO: classes, geração, Dijkstra, roteamento, resumo e benchmark
 ├── README.md         # Este documento
 └── Resultado/        # Arquivos gerados (resumos, resultados, não alocadas)
 ```
@@ -37,7 +37,7 @@ O objetivo deste projeto é simular um sistema de alocação de entregas em uma 
 2. Execute o script principal:
 
    ```bash
-   python main.py
+   python roteamento_entregas.py
    ```
 
 Ao rodar, serão gerados em `Resultado/`:
@@ -48,14 +48,8 @@ Ao rodar, serão gerados em `Resultado/`:
 
 ## Parâmetros Configuráveis
 
-- **Cenários:** no `main.py`, ajuste a lista `cenarios` para outros tamanhos de entregas e caminhões.  
-- **Escalas:** no `main.py`, modifique `escalas` para testar mais ou menos fatores de escala.  
+- **Cenários:** no `roteamento_entregas.py`, ajuste a lista `cenarios` para outros tamanhos de entregas e caminhões.  
+- **Escalas:** no `roteamento_entregas.py`, modifique `escalas` para testar mais ou menos fatores de escala.  
 - **Velocidade média:** altere a constante de `50 km/h` dentro de `planejar_rotas` se desejar outra velocidade.  
-
-## Autores
-
-Desenvolvido por Pedro Pimentel, Guilherme Sampaio, Eduardo Oliveira, Daniel Koshino, Arthur Santos Lima e Allan da Silva Gomes.
-
----
 
 Qualquer dúvida ou sugestão, abra uma issue ou envie um e-mail para pe.pimentel19@gmail.com.
